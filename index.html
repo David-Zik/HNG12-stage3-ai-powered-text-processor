@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered Text Processor</title>
+
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.6.0/uicons-solid-straight/css/uicons-solid-straight.css'> 
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class='container'>
+        <header>
+          <h2>AI-Powered Text Processor</h2>
+          <div class='language-translate-container'>
+            <div class='translate-icon'>
+              <i class="fi fi-rr-language"></i>
+            </div>
+            <select name="languages" id="languages">
+              <option value="english">English</option>
+              <option value="portuguese">Portuguese</option>
+              <option value="spanish">Spanish</option>
+              <option value="russian">Russian</option>
+              <option value="turkish">Turkish</option>
+              <option value="french">French</option>
+            </select>
+          </div>
+        </header>
+        <main class="chat-container">
+          <!-- <div class="chat-message-container">
+            <div class="message-language-container">
+              <p class="message"></p>
+              <p class="language-detect">Detected Language: <span class="language"></span></p>
+            </div>
+            <div class="time-stamp-container">
+              <p class="time-stamp"></p>
+            </div>
+          </div> -->
+        </main>
+
+        <section class='bottom-section'>
+          <div class='translate-summarize-btn'>
+            <button class='translate-btn action-btn btn'><i class="fi fi-rr-language translate-icon-btn"></i> Translate</button>
+            <button class='summarize-btn action-btn btn hidden-btn'><i class="fi fi-ss-compress"></i> Summarize</button>
+          </div>
+          <form class='textarea-send-container form'>
+            <div class='text-field'>
+              <textarea name="user-input" id="user-input" rows="2" cols="40" placeholder="Type your message..." aria-required="true"></textarea>
+            </div>
+            <div class="send-btn">
+              <button class="send btn" type="submit"><i class="fi fi-rs-paper-plane"></i></button>
+            </div>
+          </form>
+        </section>
+          
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
