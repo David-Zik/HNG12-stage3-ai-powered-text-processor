@@ -1,4 +1,18 @@
 "use strict";
+const summarizerToken = document.createElement('meta');
+summarizerToken.httpEquiv = 'https://ai-powered-text-processor-cr8.vercel.app/';
+summarizerToken.content = 'Ausmh05ogONpGo4U7XFFBZ0GLZQogcFwBLjQhRS8aHmLuAS9YfmQh50vayF+BgTS3cm2bzp48Z1qjWELDbr0KgAAAACHeyJvcmlnaW4iOiJodHRwczovL2FpLXBvd2VyZWQtdGV4dC1wcm9jZXNzb3ItY3I4LnZlcmNlbC5hcHA6NDQzIiwiZmVhdHVyZSI6IkFJU3VtbWFyaXphdGlvbkFQSSIsImV4cGlyeSI6MTc1MzE0MjQwMCwiaXNTdWJkb21haW4iOnRydWV9';
+document.head.append(summarizerToken);
+
+const translatorToken = document.createElement('meta');
+translatorToken.httpEquiv = 'https://ai-powered-text-processor-cr8.vercel.app/';
+translatorToken.content = 'ApAJNMYU1fd3V+7OQP5adSWpTr1gNwtTcrCNOW5R8hxDffA+AlHLcXEuaMpnzn8k0Q1M3WNHIm1dK4Q6ZFavmwAAAACDeyJvcmlnaW4iOiJodHRwczovL2FpLXBvd2VyZWQtdGV4dC1wcm9jZXNzb3ItY3I4LnZlcmNlbC5hcHA6NDQzIiwiZmVhdHVyZSI6IlRyYW5zbGF0aW9uQVBJIiwiZXhwaXJ5IjoxNzUzMTQyNDAwLCJpc1N1YmRvbWFpbiI6dHJ1ZX0=';
+document.head.append(translatorToken);
+
+const langDetectorToken = document.createElement('meta');
+langDetectorToken.httpEquiv = 'https://ai-powered-text-processor-cr8.vercel.app/';
+langDetectorToken.content = 'Aum04L0pxyAZyrIjegXnlawGDcrT4m5DXqIH4lo+S+IHJB6aOLFyib1zF/y6qQ2J+xVGra7p7NklSKdc4SDfHwwAAACJeyJvcmlnaW4iOiJodHRwczovL2FpLXBvd2VyZWQtdGV4dC1wcm9jZXNzb3ItY3I4LnZlcmNlbC5hcHA6NDQzIiwiZmVhdHVyZSI6Ikxhbmd1YWdlRGV0ZWN0aW9uQVBJIiwiZXhwaXJ5IjoxNzQ5NTk5OTk5LCJpc1N1YmRvbWFpbiI6dHJ1ZX0=';
+document.head.append(langDetectorToken);
 const chatContainer = document.querySelector(".chat-container");
 const languageSelector = document.querySelector("#languages");const languageDetected =  document.querySelector(".language");
 const translateBtn = document.querySelector(".translate-btn");
@@ -123,7 +137,7 @@ const initializeSummerizer = async () => {
      sharedContext: "Please summarize this text",
     type: "key-points",
     format: 'markdown',
-    length: 'medium',
+    length: 'short',
    };
    
    const available = (await self.ai.summarizer.capabilities()).available;
