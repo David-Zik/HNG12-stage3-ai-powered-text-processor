@@ -38,6 +38,7 @@ const timeStamp = new Date().toLocaleString("en-Us", {
 });
 let message;
 // console.log(languageDetected);
+
 let setLanguage;
 let currUserInput = "";
 let languageCode; // Holds detected language BCP 47 code
@@ -54,33 +55,72 @@ languageSelect.addEventListener("change", () => {
   translationLanguageBCP47 = languageSelect.value;
 });
 
-// const createMessageElement = (message) => `
-// <div class="chat-message-container">
-// <div class="message-language-container">
-// <p class="message">${message.text}</p>
-// <p class="language-detect">Detected Language: <span class=>${testing}</span></p>
-// </div>
-// <div class="time-stamp-container">
-// <p class="time-stamp">${message.timeStamp}</p>
-// </div>
-// </div>
-// `;
+const detectLanguage = async (text) => {
+  if ("ai" in self && "languageDetector" in self.ai) {
+    console.log("Language detector is available");
 
+    try {
+      const detector = await self.ai.languageDetector.create();
+      console.log(detector);
+
+      const detected = await detector.detect(text);
+      console.log(detected);
+
+      // Loop through the array to check structure
+      detected.forEach((item, index) => {
+        console.log(`Item ${index}:`, item);
+      });
+
+      if (detected.length > 0) {
+        const detectedLanguage = detected[0].detectedLanguage;
+
+        const languageMap = {
+          en: "English",
+          fr: "French",
+          es: "Spanish",
+          ru: "Russian",
+          pt: "Portuguese",
+          tr: "Turkish",
+        };
+
+        // Update the the variable with the detected language
+        setLanguage = languageMap[detectedLanguage] || "Unknown";
+        // setInterval(
+        //   (setLanguage = languageMap[detectedLanguage] || "Unknown"),
+        //   1000
+        // );
+        languageCode = detectedLanguage || "Unknown";
+        console.log("Detected Language:", detectedLanguage);
+        console.log(`Variable: ${setLanguage}`);
+      } else {
+        console.log("No language detected");
+      }
+    } catch (error) {
+      console.error("Language detection failed:", error);
+    }
+  } else {
+    console.log("Language Detector API not available.");
+  }
+};
+
+/////////////////////////////////////////////////////////////
+// Create message element functionality
 const createMessageElement = (message) => `
 <div class="chat-message-container">
 <div class="message-language-container">
 <p class="message">${message.text}</p>
-<div class="language-detect--time">Detected Language: ${message.language}
+<div class="language-detect--time">Detected: ${message.language}
 <p class="time-stamp">${message.timeStamp}</p>
 </div>
 </div>
 </div>
 `;
 
-// Send message function
-const sendMessage = (e) => {
+// Send message functionlity
+const sendMessage = async (e) => {
   e.preventDefault();
-  detectLanguage(textInput.value);
+
+  await detectLanguage(textInput.value);
   currUserInput = textInput.value;
   initializeSummerizer();
   console.log(setLanguage);
@@ -100,12 +140,14 @@ const sendMessage = (e) => {
 
   if (!message.text.trim()) return;
   chatContainer.innerHTML += createMessageElement(message);
-  // scroll to top when new messages is added
+  // scroll to top when message is loading
   chatContainer.scrollTop = chatContainer.scrollHeight;
   textInput.value = "";
   console.log(currUserInput);
 };
 
+/////////////////////////////////////////////////////////////
+// Language summarizer functionality
 let summarizer;
 
 const summerizeHandler = async () => {
@@ -124,6 +166,7 @@ const summerizeHandler = async () => {
   // Append all child element
   loader.append(dot1, dot2, dot3);
   chatContainer.appendChild(loader);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
 
   const summary = await summarizer.summarize(text, {
     context: "This is just a random text from user input",
@@ -220,55 +263,13 @@ const initializeSummerizer = async () => {
   summarizeBtn.removeEventListener("click", summerizeHandler);
   summarizeBtn.addEventListener("click", summerizeHandler);
 };
-
-const detectLanguage = async (text) => {
-  if ("ai" in self && "languageDetector" in self.ai) {
-    console.log("Language detector is available");
-
-    try {
-      const detector = await self.ai.languageDetector.create();
-      console.log(detector);
-
-      const detected = await detector.detect(text);
-      console.log(detected);
-
-      // Loop through the array to check structure
-      detected.forEach((item, index) => {
-        console.log(`Item ${index}:`, item);
-      });
-
-      if (detected.length > 0) {
-        const detectedLanguage = detected[0].detectedLanguage;
-
-        const languageMap = {
-          en: "English",
-          fr: "French",
-          es: "Spanish",
-          ru: "Russian",
-          pt: "Portuguese",
-          tr: "Turkish",
-        };
-
-        // Update the the variable with the detected language
-        setLanguage = languageMap[detectedLanguage] || "Unknown";
-        languageCode = detectedLanguage || "Unknown";
-        console.log("Detected Language:", detectedLanguage);
-        console.log(`Variable: ${setLanguage}`);
-      } else {
-        console.log("No language detected");
-      }
-    } catch (error) {
-      console.error("Language detection failed:", error);
-    }
-  } else {
-    console.log("Language Detector API not available.");
-  }
-};
-
-// Call send message on send button click
+/////////////////////////////////////////////////////////////
+// Language detector funtionality
+// Call send message function on click on send button (icon)
 form.addEventListener("submit", sendMessage);
 
-// Language translation function
+/////////////////////////////////////////////////////////////
+// Language translation functionality
 const translateLanguage = async () => {
   if ("ai" in self && "translator" in self.ai) {
     console.log("The Translator API is supported.");
@@ -286,6 +287,7 @@ const translateLanguage = async () => {
         // Append all child element
         loader.append(dot1, dot2, dot3);
         chatContainer.appendChild(loader);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
 
         const translatorCapabilities = await self.ai.translator.capabilities();
         // Check if translator can translate between both language
@@ -302,28 +304,6 @@ const translateLanguage = async () => {
         // Translate this text
         const translate = await translator.translate(currUserInput);
         console.log(translate);
-
-        // <div class="chat-message-container">
-        // <div class="message-language-container">
-        // <p class="message">${message.text}</p>
-        // <div class="language-detect--time">Detected Language: ${testing}
-        // <p class="time-stamp">${message.timeStamp}</p>
-        // </div>
-        // </div>
-        // </div>
-
-        // Create parent element
-        // const loader = document.createElement("div");
-        // loader.classList.add("dot-loader");
-
-        // // Create child element
-        // const dot1 = document.createElement("span");
-        // const dot2 = document.createElement("span");
-        // const dot3 = document.createElement("span");
-
-        // // Append all child element
-        // loader.append(dot1, dot2, dot3);
-        // chatContainer.appendChild(loader);
 
         setTimeout(() => {
           // Create elements and append child
@@ -376,7 +356,7 @@ const translateLanguage = async () => {
               chatContainer.appendChild(translateMessageContainer);
           }
           chatContainer.scrollTop = chatContainer.scrollHeight;
-        }, 3000);
+        }, 1000);
       } else console.log("Can't translate user input is empty");
     } catch (error) {
       console.log("Translation failed:", error);
@@ -385,7 +365,5 @@ const translateLanguage = async () => {
     console.log("The Translator API is not supported");
   }
 };
-
-// translateLanguage();
 
 translateBtn.addEventListener("click", translateLanguage);
