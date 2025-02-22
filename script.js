@@ -18,7 +18,7 @@ langDetectorToken.content =
   "Aum04L0pxyAZyrIjegXnlawGDcrT4m5DXqIH4lo+S+IHJB6aOLFyib1zF/y6qQ2J+xVGra7p7NklSKdc4SDfHwwAAACJeyJvcmlnaW4iOiJodHRwczovL2FpLXBvd2VyZWQtdGV4dC1wcm9jZXNzb3ItY3I4LnZlcmNlbC5hcHA6NDQzIiwiZmVhdHVyZSI6Ikxhbmd1YWdlRGV0ZWN0aW9uQVBJIiwiZXhwaXJ5IjoxNzQ5NTk5OTk5LCJpc1N1YmRvbWFpbiI6dHJ1ZX0=";
 document.head.append(langDetectorToken);
 
-// Selected element
+// Elements
 const chatContainer = document.querySelector(".chat-container");
 const languageSelect = document.getElementById("languages");
 const languageDetected = document.querySelector(".language");
@@ -29,16 +29,13 @@ const textInput = document.querySelector("textarea");
 const sendBtn = document.querySelector(".send");
 const displayMessage = document.querySelector(".message");
 
-console.log(languageSelect);
-
 const timeStamp = new Date().toLocaleString("en-Us", {
   hour: "numeric",
   minute: "numeric",
   hour12: true,
 });
-let message;
-// console.log(languageDetected);
 
+let message;
 let setLanguage;
 let currUserInput = "";
 let languageCode; // Holds detected language BCP 47 code
@@ -46,8 +43,6 @@ let translationLanguage; // Holds the actual selected language
 let translationLanguageBCP47; // Holds the bcp 47 value of user selected langauge
 
 languageSelect.addEventListener("change", () => {
-  console.log("Selected Language:", languageSelect.value);
-
   // Set variable with outer text when user select a language
   translationLanguage =
     languageSelect.options[languageSelect.selectedIndex].outerText;
@@ -61,13 +56,10 @@ const detectLanguage = async (text) => {
   } else {
     const languageDetectorCapabilities =
       await self.ai.languageDetector.capabilities();
-    console.log(languageDetectorCapabilities);
     const canDetect = languageDetectorCapabilities.available;
-    console.log(canDetect);
 
-    // Define an empty variable that will be modified
+    // Define an empty variable that will be modified later
     let detector;
-
     if (canDetect === "no") {
       // The language detector isn't usable.
       return;
@@ -75,7 +67,6 @@ const detectLanguage = async (text) => {
     if (canDetect === "readily") {
       // The language detector can immediately be used.
       detector = await self.ai.languageDetector.create();
-      console.log(detector);
     } else {
       // The language detector can be used after model download.
       detector = await self.ai.languageDetector.create({
@@ -90,12 +81,11 @@ const detectLanguage = async (text) => {
 
     try {
       const detected = await detector.detect(text);
-      console.log(detected);
 
       // Loop through the array to check structure
-      detected.forEach((item, index) => {
-        console.log(`Item ${index}:`, item);
-      });
+      // detected.forEach((item, index) => {
+      //   // console.log(`Item ${index}:`, item);
+      // });
 
       if (detected.length > 0) {
         const detectedLanguage = detected[0].detectedLanguage;
@@ -113,61 +103,15 @@ const detectLanguage = async (text) => {
         setLanguage = languageMap[detectedLanguage] || "Unknown";
         // Update language code variable with the bcp 47 code
         languageCode = detectedLanguage || "Unknown";
-        console.log("Detected Language:", detectedLanguage);
-        console.log(`Variable: ${setLanguage}`);
+        // console.log("Detected Language:", detectedLanguage);
+        // console.log(`Variable: ${setLanguage}`);
       } else {
-        console.log("No language detected");
+        // console.log("No language detected");
       }
     } catch (error) {
-      console.error("Language detection failed:", error);
+      // console.error("Language detection failed:", error);
     }
   }
-
-  // if ("ai" in self && "languageDetector" in self.ai) {
-  //   console.log("Language detector is available");
-
-  //   try {
-  //     const detector = await self.ai.languageDetector.create();
-  //     console.log(detector);
-
-  //     const detected = await detector.detect(text);
-  //     console.log(detected);
-
-  //     // Loop through the array to check structure
-  //     detected.forEach((item, index) => {
-  //       console.log(`Item ${index}:`, item);
-  //     });
-
-  //     if (detected.length > 0) {
-  //       const detectedLanguage = detected[0].detectedLanguage;
-
-  //       const languageMap = {
-  //         en: "English",
-  //         fr: "French",
-  //         es: "Spanish",
-  //         ru: "Russian",
-  //         pt: "Portuguese",
-  //         tr: "Turkish",
-  //       };
-
-  //       // Update the the variable with the detected language
-  //       setLanguage = languageMap[detectedLanguage] || "Unknown";
-  //       // setInterval(
-  //       //   (setLanguage = languageMap[detectedLanguage] || "Unknown"),
-  //       //   1000
-  //       // );
-  //       languageCode = detectedLanguage || "Unknown";
-  //       console.log("Detected Language:", detectedLanguage);
-  //       console.log(`Variable: ${setLanguage}`);
-  //     } else {
-  //       console.log("No language detected");
-  //     }
-  //   } catch (error) {
-  //     console.error("Language detection failed:", error);
-  //   }
-  // } else {
-  //   console.log("Language Detector API not available.");
-  // }
 };
 
 /////////////////////////////////////////////////////////////
@@ -190,7 +134,6 @@ const sendMessage = async (e) => {
   await detectLanguage(textInput.value);
   currUserInput = textInput.value;
   initializeSummerizer();
-  console.log(setLanguage);
 
   const timeStamp = new Date().toLocaleString("en-US", {
     hour: "numeric",
@@ -202,15 +145,12 @@ const sendMessage = async (e) => {
     language: setLanguage,
     timeStamp,
   };
-  console.log(message);
-  console.log(message.text);
 
   if (!message.text.trim()) return;
   chatContainer.innerHTML += createMessageElement(message);
   // scroll to top when message is loading
   chatContainer.scrollTop = chatContainer.scrollHeight;
   textInput.value = "";
-  console.log(currUserInput);
 };
 
 /////////////////////////////////////////////////////////////
@@ -219,8 +159,6 @@ let summarizer;
 
 const summerizeHandler = async () => {
   const text = currUserInput;
-  console.log(text);
-
   // Create parent container
   const loader = document.createElement("div");
   loader.classList.add("dot-loader");
@@ -238,7 +176,6 @@ const summerizeHandler = async () => {
   const summary = await summarizer.summarize(text, {
     context: "This is just a random text from user input",
   });
-  console.log(summary);
   const refinedSummary = summary.replaceAll("- ", "");
 
   // Parent container
@@ -295,15 +232,13 @@ const summerizeHandler = async () => {
 const initializeSummerizer = async () => {
   // Split text by the empty string into an array
   const wordsArr = textInput.value.split(" ");
-  console.log(wordsArr);
-  console.log(currUserInput);
 
   // Display summarize button if text >= 150
   if (wordsArr.length >= 150) {
     summarizeBtn.classList.remove("hidden-btn");
   }
 
-  // Summarizer object
+  // Summarizer object of options
   const options = {
     sharedContext: "Please summarize this text",
     type: "key-points",
@@ -312,7 +247,6 @@ const initializeSummerizer = async () => {
   };
 
   const available = (await self.ai.summarizer.capabilities()).available;
-  console.log(available);
 
   //  Check if Summarizer API is available
   if (available === "no") {
@@ -335,19 +269,21 @@ const initializeSummerizer = async () => {
   summarizeBtn.removeEventListener("click", summerizeHandler);
   summarizeBtn.addEventListener("click", summerizeHandler);
 };
-/////////////////////////////////////////////////////////////
-// Language detector funtionality
-// Call send message function on click on send button (icon)
+
+// Call send message function on-click on send button/icon
 form.addEventListener("submit", sendMessage);
 
 /////////////////////////////////////////////////////////////
 // Language translation functionality
+// Empty translator variable
+let translator;
+
 const translateLanguage = async () => {
   if ("ai" in self && "translator" in self.ai) {
-    console.log("The Translator API is supported.");
-
+    // console.log("The Translator API is supported.");
     try {
       if (currUserInput) {
+        // Create load, parent element
         const loader = document.createElement("div");
         loader.classList.add("dot-loader");
 
@@ -362,20 +298,35 @@ const translateLanguage = async () => {
         chatContainer.scrollTop = chatContainer.scrollHeight;
 
         const translatorCapabilities = await self.ai.translator.capabilities();
-        // Check if translator can translate between both language
-        translatorCapabilities.languagePairAvailable("tr", "fr");
-        console.log(translatorCapabilities);
+        const canTranslate = translatorCapabilities.available;
 
-        // Create a translator that translates from English to french.
-        const translator = await self.ai.translator.create({
-          sourceLanguage: languageCode, //Get the current detected language (BCP 47 format)
-          targetLanguage: translationLanguageBCP47, //Get the selected language for translation (BCP 47 format)
-        });
-        console.log("Language Code", languageCode);
+        if (canTranslate === "no") {
+          console.log("Translator API is not not available");
+        }
 
-        // Translate this text
+        if (canTranslate === "readily") {
+          // The translator API can be used immediately
+          // Create a translator that translates from the current language to a selected langauge.
+          translator = await self.ai.translator.create({
+            sourceLanguage: languageCode, //Get the current detected language (BCP 47 format)
+            targetLanguage: translationLanguageBCP47, //Get the selected language for translation (BCP 47 format)
+          });
+        } else {
+          // The translator API can be used after the model is downloaded
+          translator = await self.ai.translator.create({
+            sourceLanguage: languageCode, // Get the current detected language (BCP 47 format)
+            targetLanguage: translationLanguageBCP47, // Get the selected language for translation (BCP 47 format)
+            monitor(m) {
+              m.addEventListener("downloadprogress", (e) => {
+                console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
+              });
+            },
+          });
+          await translator.ready;
+        }
+
+        // Translate the user text
         const translate = await translator.translate(currUserInput);
-        console.log(translate);
 
         setTimeout(() => {
           // Create elements and append child
@@ -385,10 +336,7 @@ const translateLanguage = async () => {
             "translate-message-container",
             "response-container"
           );
-          // translateMessageContainer.appendChild(loader);
-          // if (!translate) {
-          // }
-          // Child container of translate message container
+
           const translationNoticeContainer = document.createElement("div");
           translationNoticeContainer.classList.add(
             "translation--notice-container"
