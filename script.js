@@ -56,13 +56,39 @@ languageSelect.addEventListener("change", () => {
 });
 
 const detectLanguage = async (text) => {
-  if ("ai" in self && "languageDetector" in self.ai) {
-    console.log("Language detector is available");
+  if (!("ai" in self && "languageDetector" in self.ai)) {
+    alert("This feature is not supported in this browser");
+  } else {
+    const languageDetectorCapabilities =
+      await self.ai.languageDetector.capabilities();
+    console.log(languageDetectorCapabilities);
+    const canDetect = languageDetectorCapabilities.available;
+    console.log(canDetect);
+
+    // Define an empty variable that will be modified
+    let detector;
+
+    if (canDetect === "no") {
+      // The language detector isn't usable.
+      return;
+    }
+    if (canDetect === "readily") {
+      // The language detector can immediately be used.
+      detector = await self.ai.languageDetector.create();
+      console.log(detector);
+    } else {
+      // The language detector can be used after model download.
+      detector = await self.ai.languageDetector.create({
+        monitor(m) {
+          m.addEventListener("downloadprogress", (e) => {
+            console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
+          });
+        },
+      });
+      await detector.ready;
+    }
 
     try {
-      const detector = await self.ai.languageDetector.create();
-      console.log(detector);
-
       const detected = await detector.detect(text);
       console.log(detected);
 
@@ -83,12 +109,9 @@ const detectLanguage = async (text) => {
           tr: "Turkish",
         };
 
-        // Update the the variable with the detected language
+        // Update the set language variable with the detected language or default to unknown
         setLanguage = languageMap[detectedLanguage] || "Unknown";
-        // setInterval(
-        //   (setLanguage = languageMap[detectedLanguage] || "Unknown"),
-        //   1000
-        // );
+        // Update language code variable with the bcp 47 code
         languageCode = detectedLanguage || "Unknown";
         console.log("Detected Language:", detectedLanguage);
         console.log(`Variable: ${setLanguage}`);
@@ -98,9 +121,53 @@ const detectLanguage = async (text) => {
     } catch (error) {
       console.error("Language detection failed:", error);
     }
-  } else {
-    console.log("Language Detector API not available.");
   }
+
+  // if ("ai" in self && "languageDetector" in self.ai) {
+  //   console.log("Language detector is available");
+
+  //   try {
+  //     const detector = await self.ai.languageDetector.create();
+  //     console.log(detector);
+
+  //     const detected = await detector.detect(text);
+  //     console.log(detected);
+
+  //     // Loop through the array to check structure
+  //     detected.forEach((item, index) => {
+  //       console.log(`Item ${index}:`, item);
+  //     });
+
+  //     if (detected.length > 0) {
+  //       const detectedLanguage = detected[0].detectedLanguage;
+
+  //       const languageMap = {
+  //         en: "English",
+  //         fr: "French",
+  //         es: "Spanish",
+  //         ru: "Russian",
+  //         pt: "Portuguese",
+  //         tr: "Turkish",
+  //       };
+
+  //       // Update the the variable with the detected language
+  //       setLanguage = languageMap[detectedLanguage] || "Unknown";
+  //       // setInterval(
+  //       //   (setLanguage = languageMap[detectedLanguage] || "Unknown"),
+  //       //   1000
+  //       // );
+  //       languageCode = detectedLanguage || "Unknown";
+  //       console.log("Detected Language:", detectedLanguage);
+  //       console.log(`Variable: ${setLanguage}`);
+  //     } else {
+  //       console.log("No language detected");
+  //     }
+  //   } catch (error) {
+  //     console.error("Language detection failed:", error);
+  //   }
+  // } else {
+  //   console.log("Language Detector API not available.");
+  // }
 };
 
 /////////////////////////////////////////////////////////////
@@ -171,6 +238,8 @@ const summerizeHandler = async () => {
   const summary = await summarizer.summarize(text, {
     context: "This is just a random text from user input",
   });
+  console.log(summary);
+  const refinedSummary = summary.replaceAll("- ", "");
 
   // Parent container
   const summaryMessageContainer = document.createElement("div");
@@ -183,7 +252,7 @@ const summerizeHandler = async () => {
   // Child of message language container
   const message = document.createElement("p");
   message.classList.add("message");
-  message.textContent = summary;
+  message.textContent = refinedSummary;
   message.style.backgroundColor = "#ffffff";
   message.style.color = "#1F2937";
 
@@ -238,7 +307,7 @@ const initializeSummerizer = async () => {
   const options = {
     sharedContext: "Please summarize this text",
     type: "key-points",
-    format: "markdown",
+    format: "plain-text",
     length: "short",
   };
 
@@ -246,7 +315,10 @@ const initializeSummerizer = async () => {
   console.log(available);
 
   //  Check if Summarizer API is available
-  if (available === "no") console.log("Summarizer API is not available");
+  if (available === "no") {
+    console.log("Summarizer API is not available");
+    alert("Summarizer is not supported on this browser");
+  }
 
   if (available === "readily") {
     // The Summarizer API can be used immediately
