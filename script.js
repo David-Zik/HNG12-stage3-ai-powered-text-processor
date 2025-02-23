@@ -1,19 +1,18 @@
 "use strict";
 const summarizerToken = document.createElement("meta");
-summarizerToken.httpEquiv = "https://ai-powered-text-processor-cr8.vercel.app/";
+summarizerToken.httpEquiv = "origin-trial";
 summarizerToken.content =
   "Ausmh05ogONpGo4U7XFFBZ0GLZQogcFwBLjQhRS8aHmLuAS9YfmQh50vayF+BgTS3cm2bzp48Z1qjWELDbr0KgAAAACHeyJvcmlnaW4iOiJodHRwczovL2FpLXBvd2VyZWQtdGV4dC1wcm9jZXNzb3ItY3I4LnZlcmNlbC5hcHA6NDQzIiwiZmVhdHVyZSI6IkFJU3VtbWFyaXphdGlvbkFQSSIsImV4cGlyeSI6MTc1MzE0MjQwMCwiaXNTdWJkb21haW4iOnRydWV9";
 document.head.append(summarizerToken);
 
 const translatorToken = document.createElement("meta");
-translatorToken.httpEquiv = "https://ai-powered-text-processor-cr8.vercel.app/";
+translatorToken.httpEquiv = "origin-trial";
 translatorToken.content =
   "ApAJNMYU1fd3V+7OQP5adSWpTr1gNwtTcrCNOW5R8hxDffA+AlHLcXEuaMpnzn8k0Q1M3WNHIm1dK4Q6ZFavmwAAAACDeyJvcmlnaW4iOiJodHRwczovL2FpLXBvd2VyZWQtdGV4dC1wcm9jZXNzb3ItY3I4LnZlcmNlbC5hcHA6NDQzIiwiZmVhdHVyZSI6IlRyYW5zbGF0aW9uQVBJIiwiZXhwaXJ5IjoxNzUzMTQyNDAwLCJpc1N1YmRvbWFpbiI6dHJ1ZX0=";
 document.head.append(translatorToken);
 
 const langDetectorToken = document.createElement("meta");
-langDetectorToken.httpEquiv =
-  "https://ai-powered-text-processor-cr8.vercel.app/";
+langDetectorToken.httpEquiv = "origin-trial";
 langDetectorToken.content =
   "Aum04L0pxyAZyrIjegXnlawGDcrT4m5DXqIH4lo+S+IHJB6aOLFyib1zF/y6qQ2J+xVGra7p7NklSKdc4SDfHwwAAACJeyJvcmlnaW4iOiJodHRwczovL2FpLXBvd2VyZWQtdGV4dC1wcm9jZXNzb3ItY3I4LnZlcmNlbC5hcHA6NDQzIiwiZmVhdHVyZSI6Ikxhbmd1YWdlRGV0ZWN0aW9uQVBJIiwiZXhwaXJ5IjoxNzQ5NTk5OTk5LCJpc1N1YmRvbWFpbiI6dHJ1ZX0=";
 document.head.append(langDetectorToken);
@@ -40,7 +39,8 @@ let setLanguage;
 let currUserInput = "";
 let languageCode; // Holds detected language BCP 47 code
 let translationLanguage; // Holds the actual selected language
-let translationLanguageBCP47; // Holds the bcp 47 value of user selected langauge
+let translationLanguageBCP47 = "en"; // Holds the bcp 47 value of user selected langauge
+let defaultLanguage = "English";
 
 languageSelect.addEventListener("change", () => {
   // Set variable with outer text when user select a language
@@ -353,7 +353,9 @@ const translateLanguage = async () => {
           // Child of notice timeStamp container
           const notice = document.createElement("p");
           notice.classList.add("notice");
-          notice.textContent = `🌐🔁 Translation: ${translationLanguage}`;
+          notice.textContent = `🌐🔁 Translation: ${
+            translationLanguage ? translationLanguage : defaultLanguage
+          }`;
           notice.style.color = "#6B7280";
           // Child of notice timeStamp container
           const time = document.createElement("p");
